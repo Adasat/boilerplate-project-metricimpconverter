@@ -1,52 +1,47 @@
 function ConvertHandler() {
-
-  
-  
+ 
   this.getNum = function(input) {
-         const re = /^\d+(\.\d+)?(\/\d+)?[a-zA-Z]+$/
-  let result = input.trim();
+         const idx = input.search(/[a-z]/i); 
+        let num = input.slice(0, idx)
+        let unit = input.slice(idx)
+
         
-        if (input === "") {
-            return 1; // Valor predeterminado de 1 si no se proporciona un número
-        } else if(re.test(result) === false) {
-            return 'invalid number';  
+        if (this.validUnits.includes(unit) === false) return 'invalid number'
+        if (/\d+\/\d+\/\d+/.test(num)) return 'invalid number'
+        if (/\/\//.test(num)) return 'invalid number'
+        if (num === '') return 1
+
+        try {
+          const result = eval(num);
+          if (Number.isInteger(result)) {
+        return result 
+      } else {
+        const roundedResult = Number(Math.round(result + 'e' + 5) + 'e-' + 5); 
+      return roundedResult
+      }
+        } 
+        catch {
+          return 'invalid number'
         }
-       
-        
 
-        // Buscar la posición del primer caracter no numérico
-        const nonNumericIndex = result.search(/[^\d./-]/);
-  console.log(nonNumericIndex)       
-
-        // Si hay caracteres no numéricos, dividir la cadena en parte numérica y resto
-        const numericPart = input.slice(0, nonNumericIndex);
-        const rest = input.slice(nonNumericIndex);
-
-        // Verificar si el resto representa una fracción válida (número/número)
-        const fractionParts = rest.split('/');
-        if (fractionParts.length === 2) {
-            const numerator = parseFloat(fractionParts[0]);
-            const denominator = parseFloat(fractionParts[1]);
-
-            if (!isNaN(numerator) && !isNaN(denominator) && denominator !== 0) {
-                return numerator / denominator;  // Calcular el valor de la fracción
-            } else {
-              return 'invalid fractional number'
-            }
-        }
-  
-
-        return parseInt(numericPart); 
     }
-    },
     
-
+    
+this.validUnits = ["gal", "kg", "L", "l", "lbs", "km", "mi"]
   
   this.getUnit = function(input) {
-    let result;
+    const metric = input.split(/[0-9]+/)
     
-    return result;
-  };
+    const unit = metric.length - 1
+    
+    const lowerUnit = metric[unit].toLowerCase()
+
+   if (this.validUnits.includes(lowerUnit)) {
+       return (lowerUnit === 'l') ?  lowerUnit.toUpperCase(): lowerUnit;
+    } else {
+      return 'Invalid unit';
+    } 
+  }
   
   this.getReturnUnit = function(initUnit) {
     const conversions = {
@@ -60,10 +55,26 @@ function ConvertHandler() {
     return conversions[initUnit] || null;
   };
 
+  this.validUnits = ["gal", "kg", "L", "l", "lbs", "km", "mi"]
+
+
   this.spellOutUnit = function(unit) {
-    let result;
-    
-    return result;
+    switch (unit) {
+      case "gal":
+        return "gallons";
+      case "L":
+        return "liters";
+      case "kg":
+        return "kilograms";
+      case "lbs":
+        return "pounds";
+      case "km":
+        return "kilometers";
+      case "mi":
+        return "miles";
+      default:
+        return 'Invalid unit';
+    }
   };
   
   this.convert = function(initNum, initUnit) {
@@ -93,7 +104,6 @@ function ConvertHandler() {
         break;
     }
 
-    
     return result
   
   };
